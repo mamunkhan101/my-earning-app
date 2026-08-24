@@ -1,1 +1,120 @@
 
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ইনকাম বট</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #fff6e9;
+            margin: 0;
+            padding: 15px;
+        }
+        .balance-card {
+            background: linear-gradient(135deg, #ff7e00, #ff9900);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .balance-card h3 { margin: 0; font-size: 16px; opacity: 0.9; }
+        .balance-card h1 { margin: 10px 0 5px 0; font-size: 32px; }
+        
+        .rule-btn {
+            background: #27ae60;
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: bold;
+        }
+        
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .card {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .card h2 { margin: 5px 0 0 0; color: #333; }
+        .card p { margin: 0; color: #777; font-size: 12px; }
+        
+        .ad-btn {
+            background: #ff4757;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 15px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="balance-card">
+        <h3>আপনার ব্যালেন্স</h3>
+        <h1 id="balance">৫০.০০ টাকা</h1>
+        <small>স্বাগতম, ইউজার</small>
+    </div>
+
+    <div class="rule-btn">
+        📖 কাজ করার নিয়ম
+        <span>➔</span>
+    </div>
+
+    <div class="grid-container">
+        <div class="card">
+            <p>এই ঘণ্টায় এড</p>
+            <h2 id="hourly-ad">0/10</h2>
+        </div>
+        <div class="card">
+            <p>রেফারেল</p>
+            <h2 id="referral-count">0</h2>
+        </div>
+        <div class="card">
+            <p>মোট এড</p>
+            <h2 id="total-ad">0</h2>
+        </div>
+        <div class="card">
+            <p>উইথড্র</p>
+            <h2>৳ 0</h2>
+        </div>
+    </div>
+
+    <button class="ad-btn" onclick="watchAd()">🔥 ভিডিও দেখুন ১০০ টাকা</button>
+
+    <script>
+        let balance = 50;
+        let adsWatched = 0;
+
+        function watchAd() {
+            // এখানে Monetag / Direct Ad Link বসাবেন
+            alert("এড দেখা শুরু হচ্ছে...");
+            
+            // ডেমো হিসেবে ব্যালেন্স বাড়ানো দেখাচ্ছে
+            adsWatched++;
+            balance += 5;
+            document.getElementById('balance').innerText = balance.toFixed(2) + " টাকা";
+            document.getElementById('total-ad').innerText = adsWatched;
+        }
+
+        // Telegram Mini App Init
+        window.Telegram.WebApp.ready();
+    </script>
+</body>
+</html>
