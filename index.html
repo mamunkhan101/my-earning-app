@@ -3,104 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daily Cash Pro</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <title>Watch & Earn App</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #fff6e9;
-            margin: 0;
-            padding: 15px;
-            padding-bottom: 70px;
-        }
-        .page { display: none; }
-        .active-page { display: block; }
-
-        .balance-card {
-            background: linear-gradient(135deg, #ff7e00, #ff9900);
-            color: white;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            margin-bottom: 15px;
-        }
-        .balance-card h3 { margin: 0; font-size: 16px; opacity: 0.9; }
-        .balance-card h1 { margin: 10px 0 5px 0; font-size: 32px; }
-
-        .card {
-            background: white;
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        .grid-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        .ad-btn {
-            background: #ff7e00;
-            color: white;
-            border: none;
-            width: 100%;
-            padding: 12px;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            margin-top: 10px;
-            cursor: pointer;
-        }
-        .join-btn {
-            background: #0088cc;
-            color: white;
-            border: none;
-            width: 100%;
-            padding: 12px;
-            border-radius: 10px;
-            font-weight: bold;
-            margin-top: 10px;
-            cursor: pointer;
-        }
-
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: white;
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 0;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-            z-index: 1000;
-        }
-        .nav-item {
-            text-align: center;
-            color: #777;
-            font-size: 12px;
-            cursor: pointer;
-            text-decoration: none;
-            flex: 1;
-        }
-        .nav-item.active {
-            color: #ff7e00;
-            font-weight: bold;
-        }
-        .nav-item div { font-size: 18px; margin-bottom: 2px; }
-
-        .method-btn {
-            background: #f0f2f5;
-            border: 1px solid #ddd;
-            padding: 12px;
-            margin: 8px 0;
-            border-radius: 8px;
-            font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-        }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
+        body { background-color: #f4f7f6; color: #333; padding: 15px; }
+        .container { max-width: 500px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .header { text-align: center; margin-bottom: 20px; }
+        .balance-box { background: linear-gradient(135deg, #28a745, #218838); color: white; padding: 15px; border-radius: 10px; text-align: center; font-size: 20px; font-weight: bold; margin-bottom: 20px; }
+        .refer-section { background: #e9ecef; padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: center; }
+        .refer-section input { width: 70%; padding: 8px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; }
+        .refer-section button { padding: 8px 12px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .ads-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .ad-btn { background: #007bff; color: white; border: none; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .ad-btn:disabled { background: #6c757d; cursor: not-allowed; }
     </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h2>Watch & Earn</h2>
+    </div>
+
+    <div class="balance-box">
+        ব্যালেন্স: <span id="balance">0.00</span> ৳
+    </div>
+
+    <div class="refer-section">
+        <p style="margin-bottom: 8px; font-weight: bold;">রেফার করে ৫০ টাকা ইনকাম করুন!</p>
+        <p style="font-size: 12px; color: #555; margin-bottom: 8px;">আপনার রেফার কোড: <span id="my-refer-code" style="color:#007bff; font-weight:bold;"></span></p>
+        <input type="text" id="refer-input" placeholder="রেফার কোড লিখুন">
+        <button onclick="applyReferral()">সাবমিট</button>
+    </div>
+
+    <h3 style="margin-bottom: 12px; text-align: center;">এড দেখে ইনকাম করুন (১০ মিনিট পর পর)</h3>
+    
+    <div class="ads-grid" id="ads-container"></div>
+</div>
+
+<script>
+    const AD_URL = "https://www.profitableratecpmnetwork.com/dvbt9bedkz?key=ab9b6fb6e0c857a93725bca13f1c327f";
+    const TOTAL_ADS = 30;
+    const COOLDOWN_TIME = 10 * 60;
+    const AD_REWARD = 10;
+    const REFER_BONUS = 50;
+
+    let balance = parseFloat(localStorage.getItem("user_balance")) || 0;
+    let userReferCode = localStorage.getItem("user_refer_code") || "REF" + Math.floor(1000 + Math.random() * 9000);
+    let isReferred = localStorage.getItem("is_referred") === "true";
+
+    localStorage.setItem("user_refer_code", userReferCode);
+    document.getElementById("balance").innerText = balance.toFixed(2);
+    document.getElementById("my-refer-code").innerText = userReferCode;
+
+    const adsContainer = document.getElementById("ads-container");
+
+    for (let i = 1; i <= TOTAL_ADS; i++) {
+        let btn = document.createElement("button");
+        btn.className = "ad-btn";
+        btn.id = `ad-btn-${i}`;
+        btn.innerText = `Ad ${i} দেখুন`;
+        btn.onclick = () => watchAd(i);
+        adsContainer.appendChild(btn);
+
+        checkCooldown(i);
+    }
+
+    function watchAd(adIndex) {
+        window.open(AD_URL, '_blank');
+
+        balance += AD_REWARD;
+        updateBalance();
+
+        const expireTime = Date.now() + (COOLDOWN_TIME * 1000);
+        localStorage.setItem(`ad_timer_${adIndex}`, expireTime);
+
+        checkCooldown(adIndex);
+    }
+
+    function checkCooldown(adIndex) {
+        const btn = document.getElementById(`ad-btn-${adIndex}`);
+        const expireTime = localStorage.getItem(`ad_timer_${adIndex}`);
+
+        if (expireTime) {
+            const interval = setInterval(() => {
+                const remainingTime = Math.floor((expireTime - Date.now()) / 1000);
+
+                if (remainingTime <= 0) {
+                    clearInterval(interval);
+                    localStorage.removeItem(`ad_timer_${adIndex}`);
+                    btn.disabled = false;
+                    btn.innerText = `Ad ${adIndex} দেখুন`;
+                } else {
+                    btn.disabled = true;
+                    let mins = Math.floor(remainingTime / 60);
+                    let secs = remainingTime % 60;
+                    btn.innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+                }
+            }, 1000);
+        }
+    }
+
+    function applyReferral() {
+        const inputCode = document.getElementById("refer-input").value.trim();
+        if (isReferred) {
+            alert("আপনি ইতোমধ্যে রেফার কোড ব্যবহার করেছেন!");
+            return;
+        }
+        if (inputCode === userReferCode) {
+            alert("নিজের রেফার কোড নিজে ব্যবহার করতে পারবেন না!");
+            return;
+        }
+        if (inputCode !== "") {
+            balance += REFER_BONUS;
+            isReferred = true;
+            localStorage.setItem("is_referred", "true");
+            updateBalance();
+            alert("অভিনন্দন! আপনি ৫০ টাকা রেফার বোনাস পেয়েছেন।");
+        } else {
+            alert("সঠিক রেফার কোড দিন!");
+        }
+    }
+
+    function updateBalance() {
+        localStorage.setItem("user_balance", balance);
+        document.getElementById("balance").innerText = balance.toFixed(2);
+    }
+</script>
+
+</body>
+</html>
 </head>
 <body>
 
