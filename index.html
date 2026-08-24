@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ইনকাম বট</title>
+    <title>Daily Cash Pro</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
@@ -12,109 +11,254 @@
             background-color: #fff6e9;
             margin: 0;
             padding: 15px;
+            padding-bottom: 70px;
         }
+        .page { display: none; }
+        .active-page { display: block; }
+
         .balance-card {
             background: linear-gradient(135deg, #ff7e00, #ff9900);
             color: white;
             padding: 20px;
             border-radius: 15px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
         }
         .balance-card h3 { margin: 0; font-size: 16px; opacity: 0.9; }
         .balance-card h1 { margin: 10px 0 5px 0; font-size: 32px; }
-        
-        .rule-btn {
-            background: #27ae60;
-            color: white;
+
+        .card {
+            background: white;
             padding: 15px;
             border-radius: 12px;
-            margin: 15px 0;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-weight: bold;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
-        
         .grid-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
         }
-        .card {
-            background: white;
-            padding: 15px;
-            border-radius: 12px;
-            text-align: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        .card h2 { margin: 5px 0 0 0; color: #333; }
-        .card p { margin: 0; color: #777; font-size: 12px; }
-        
+
         .ad-btn {
-            background: #ff4757;
+            background: #ff7e00;
             color: white;
             border: none;
             width: 100%;
-            padding: 15px;
-            border-radius: 12px;
+            padding: 12px;
+            border-radius: 10px;
             font-size: 16px;
             font-weight: bold;
-            margin-top: 15px;
+            margin-top: 10px;
             cursor: pointer;
+        }
+        .join-btn {
+            background: #0088cc;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: bold;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+        .nav-item {
+            text-align: center;
+            color: #777;
+            font-size: 12px;
+            cursor: pointer;
+            text-decoration: none;
+            flex: 1;
+        }
+        .nav-item.active {
+            color: #ff7e00;
+            font-weight: bold;
+        }
+        .nav-item div { font-size: 18px; margin-bottom: 2px; }
+
+        .method-btn {
+            background: #f0f2f5;
+            border: 1px solid #ddd;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
         }
     </style>
 </head>
 <body>
 
-    <div class="balance-card">
-        <h3>আপনার ব্যালেন্স</h3>
-        <h1 id="balance">৫০.০০ টাকা</h1>
-        <small>স্বাগতম, ইউজার</small>
-    </div>
-
-    <div class="rule-btn">
-        📖 কাজ করার নিয়ম
-        <span>➔</span>
-    </div>
-
-    <div class="grid-container">
-        <div class="card">
-            <p>এই ঘণ্টায় এড</p>
-            <h2 id="hourly-ad">0/10</h2>
+    <div id="home-page" class="page active-page">
+        <div class="balance-card">
+            <h3>আপনার ব্যালেন্স</h3>
+            <h1 class="bal-text">৫০.০০ টাকা</h1>
+            <small id="user-name">স্বাগতম, ইউজার</small>
         </div>
         <div class="card">
-            <p>রেফারেল</p>
-            <h2 id="referral-count">0</h2>
+            <h3>📖 কাজ করার নিয়ম</h3>
+            <p style="font-size: 13px; color: #555;">প্রতি এড দেখলে ১০ টাকা যোগ হবে। টাকা তোলার জন্য ১৫ জন বন্ধুকে রেফার করা বাধ্যতামূলক।</p>
         </div>
-        <div class="card">
-            <p>মোট এড</p>
-            <h2 id="total-ad">0</h2>
-        </div>
-        <div class="card">
-            <p>উইথড্র</p>
-            <h2>৳ 0</h2>
+        <div class="grid-container">
+            <div class="card" style="text-align: center;">
+                <p>এই ঘণ্টায় এড</p>
+                <h2 id="hourly-ads">0/10</h2>
+            </div>
+            <div class="card" style="text-align: center;">
+                <p>রেফারেল (টার্গেট ১৫)</p>
+                <h2 id="ref-count">0/15</h2>
+            </div>
         </div>
     </div>
 
-    <button class="ad-btn" onclick="watchAd()">🔥 ভিডিও দেখুন ১০০ টাকা</button>
+    <div id="task-page" class="page">
+        <div class="card" style="background: #ff7e00; color: white;">
+            <h3 style="margin:0;">📋 টাস্ক পূরণ করুন</h3>
+            <p style="margin:5px 0 0 0; font-size:12px;">এড দেখে এবং চ্যানেল জয়েন করে ইনকাম করুন</p>
+        </div>
+
+        <div class="card">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3>▶️ এড দেখুন</h3>
+                <span style="background:#e8f5e9; color:#2e7d32; padding:3px 8px; border-radius:5px; font-size:12px;">১০ টাকা/এড</span>
+            </div>
+            <p style="font-size:13px; color:#666;">প্রতি এড দেখে ১০ টাকা উপার্জন করুন</p>
+            <button class="ad-btn" onclick="watchAd()">🎬 এড দেখুন</button>
+        </div>
+
+        <div class="card">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3>✈️ টেলিগ্রাম চ্যানেল জয়েন</h3>
+                <span style="background:#e8f5e9; color:#2e7d32; padding:3px 8px; border-radius:5px; font-size:12px;">৫০ টাকা</span>
+            </div>
+            <button class="join-btn" onclick="claimTask(50)">🤖 জয়েন করুন ও বোনাস নিন</button>
+        </div>
+    </div>
+
+    <div id="withdraw-page" class="page">
+        <div class="card">
+            <h3 style="color:#ff7e00; margin-top:0;">৳ টাকা উত্তোলন করুন</h3>
+            <p style="font-size: 13px; color: #666;">টাকা তুলতে কমপক্ষে ১৫ জন রেফার প্রয়োজন। (আপনার রেফার: <b id="ref-count-2">0/15</b>)</p>
+            
+            <div class="method-btn"><span>💗 বিকাশ (bKash)</span> <span>৳১০০</span></div>
+            <div class="method-btn"><span>🧡 নগদ (Nagad)</span> <span>৳১০০</span></div>
+            <div class="method-btn"><span>💜 রকেট (Rocket)</span> <span>৳১০০</span></div>
+
+            <button class="ad-btn" style="background:#27ae60;" onclick="requestWithdraw()">উইথড্র রিকোয়েস্ট পাঠান</button>
+        </div>
+    </div>
+
+    <div id="profile-page" class="page">
+        <div class="card" style="text-align: center;">
+            <h2>👤 ইউজার প্রোফাইল</h2>
+            <hr style="border:0.5px solid #eee;">
+            <p>বর্তমান ব্যালেন্স: <b class="bal-text">৫০.০০ টাকা</b></p>
+            <p>মোট সম্পন্ন এড: <b id="total-ads">0</b></p>
+            <p>মোট রেফারেল: <b id="ref-count-3">0/15</b></p>
+            <button class="ad-btn" style="background:#0088cc;" onclick="copyReferLink()">🔗 রেফারেল লিংক কপি করুন</button>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="showPage('home-page', this)">
+            <div>🏠</div> হোম
+        </div>
+        <div class="nav-item" onclick="showPage('task-page', this)">
+            <div>📋</div> টাস্ক
+        </div>
+        <div class="nav-item" onclick="showPage('withdraw-page', this)">
+            <div>💼</div> উইথড্র
+        </div>
+        <div class="nav-item" onclick="showPage('profile-page', this)">
+            <div>👤</div> প্রোফাইল
+        </div>
+    </div>
 
     <script>
-        let balance = 50;
-        let adsWatched = 0;
+        const tg = window.Telegram.WebApp;
+        tg.expand();
 
-        function watchAd() {
-            // এখানে Monetag / Direct Ad Link বসাবেন
-            alert("এড দেখা শুরু হচ্ছে...");
+        let userId = tg.initDataUnsafe?.user?.id || Math.floor(Math.random() * 899999 + 100000);
+        let userName = tg.initDataUnsafe?.user?.first_name || "ইউজার";
+        
+        let balance = 50.00;
+        let currentAds = 0;
+        let totalAds = 0;
+        let referCount = 0;
+
+        document.getElementById('user-name').innerText = "স্বাগতম, " + userName;
+
+        function showPage(pageId, element) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active-page'));
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
             
-            // ডেমো হিসেবে ব্যালেন্স বাড়ানো দেখাচ্ছে
-            adsWatched++;
-            balance += 5;
-            document.getElementById('balance').innerText = balance.toFixed(2) + " টাকা";
-            document.getElementById('total-ad').innerText = adsWatched;
+            document.getElementById(pageId).classList.add('active-page');
+            element.classList.add('active');
         }
 
-        // Telegram Mini App Init
-        window.Telegram.WebApp.ready();
+        function updateUI() {
+            document.querySelectorAll('.bal-text').forEach(el => el.innerText = balance.toFixed(2) + " টাকা");
+            document.getElementById('hourly-ads').innerText = currentAds + "/10";
+            document.getElementById('total-ads').innerText = totalAds;
+            document.getElementById('ref-count').innerText = referCount + "/15";
+            document.getElementById('ref-count-2').innerText = referCount + "/15";
+            document.getElementById('ref-count-3').innerText = referCount + "/15";
+        }
+
+        function watchAd() {
+            if (currentAds < 10) {
+                currentAds++;
+                totalAds++;
+                balance += 10.00;
+                updateUI();
+                alert("অভিনন্দন! ১০ টাকা ব্যালেন্সে যুক্ত হয়েছে।");
+            } else {
+                alert("এই ঘণ্টার ১০টি এডের লিমিট শেষ!");
+            }
+        }
+
+        function claimTask(amount) {
+            balance += amount;
+            updateUI();
+            alert("টাস্ক সফল হয়েছে! " + amount + " টাকা যোগ হয়েছে।");
+        }
+
+        function requestWithdraw() {
+            if (referCount < 15) {
+                alert("আপনার রেফারেল সংখ্যা " + referCount + "/15। টাকা তুলতে আরো " + (15 - referCount) + " জন বন্ধুকে রেফার করুন!");
+            } else if (balance < 100) {
+                alert("উইথড্র করতে সর্বনিম্ন ১০০ টাকা লাগবে!");
+            } else {
+                alert("আপনার উইথড্র রিকোয়েস্ট সফলভাবে জমা হয়েছে!");
+            }
+        }
+
+        function copyReferLink() {
+            // আপনার টেলিগ্রাম বটের ইউজারনেম নিচে "YourBotUsername" এর জায়গায় বসাতে পারেন
+            let botUsername = "DailyCashProBot"; 
+            let referLink = "https://t.me/" + botUsername + "?start=" + userId;
+            
+            navigator.clipboard.writeText(referLink).then(() => {
+                alert("আপনার ইউনিক রেফারেল লিংক কপি হয়েছে:\n" + referLink);
+            }).catch(() => {
+                alert("রেফারেল লিংক: " + referLink);
+            });
+        }
     </script>
 </body>
 </html>
