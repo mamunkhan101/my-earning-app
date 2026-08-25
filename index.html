@@ -200,6 +200,254 @@
             <p>মোট রেফারেল: <b id="ref-count-3">0/15</b></p>
             
             <div class="refer-box">
+                <p style="font-size: 12px; color: #333; margin-bottom: 5px;">আপনার রেফার আইডি: <b id="my-code-display" style="color:#0088cc;">-</b></p>
+                <button class="ad-btn" style="background:#0088cc; margin-top:0;" onclick="copyReferLink()">🔗 রেফারেল লিংক কপি করুন</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- বটম নেভিগেশন বার -->
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="showPage('home-page', this)">
+            <div>🏠</div>হোম
+        </div>
+        <div class="nav-item" onclick="showPage('task-page', this)">
+            <div>📋</div>টাস্ক
+        </div>
+        <div class="nav-item" onclick="showPage('withdraw-page', this)">
+            <div>💼</div>উইথড্র
+        </div>
+        <div class="nav-item" onclick="showPage('profile-page', this)">
+            <div>👤</div>প্রোফাইল
+        </div>
+    </div>
+
+<script>
+    const AD_URL = "https://www.profitableratecpmnetwork.com/dvbt9bedkz?key=ab9b6fb6e0c857a93725bca13f1c327f";
+    const TOTAL_ADS = 30;
+    const COOLDOWN_TIME = 10 * 60; // 10 Minutes
+
+    const tg = window.Telegram?.WebApp;
+    if(tg) tg.expand();
+
+    // User details and Unique Refer Code
+    let userId = tg?.initDataUnsafe?.user?.id || Math.floor(100000 + Math.random() * 900000);
+    let userName = tg?.initDataUnsafe?.user?.first_name || "ইউজার";
+    
+    let balance = parseFloat(localStorage.getItem("user_balance")) || 50.00;
+    let totalAds = parseInt(localStorage.getItem("total_ads")) || 0;
+    let referCount = parseInt(localStorage.getItem("refer_count")) || 0;
+
+    document.getElementById('user-name').innerText = "স্বাগতম, " + userName;
+    document.getElementById('my-code-display').innerText = userId;
+
+    // Check Referral Accept Bonus for New User
+    const urlParams = new URLSearchParams(window.location.search);
+    const startParam = urlParams.get('start') || urlParams.get('ref');
+
+    if (startParam && startParam !== String(userId)) {
+        if (!localStorage.getItem("refer_claimed")) {
+            balance += 50.00;
+            localStorage.setItem("refer_claimed", "true");
+            localStorage.setItem("user_balance", balance);
+            alert("🎉 আপনি রেফারেল লিংকের মাধ্যমে জয়েন করায় ৫০ টাকা বোনাস পেয়েছেন!");
+        }
+    }
+
+    function updateUI() {
+        document.querySelectorAll('.bal-text').forEach(el => el.innerText = balance.toFixed(2));
+        document.getElementById('hourly-ads').innerText = totalAds + "/30";
+        document.getElementById('total-ads').innerText = totalAds;
+        document.getElementById('ref-count').innerText = referCount + "/15";
+        document.getElementById('ref-count-2').innerText = referCount + "/15";
+        document.getElementById('ref-count-3').innerText = referCount + "/15";
+        localStorage.setItem("user_balance", balance);
+        localStorage.setItem("total_ads", totalAds);
+    }
+
+    function showPage(pageId, element) {
+        document.querySelectorAll('.page').forEach(page => page.classList.remove('active-page'));
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+
+        document.getElementById(pageId).classList.add('active-page');
+        element.classList.add('active');
+    }
+
+    // Generate 30 Ad Buttons dynamically
+    const adsContainer = document.getElementById("ads-container");
+    for (let i = 1; i <= TOTAL_ADS; i++) {
+        let btn = document.createElement("button");
+        btn.className = "ad-btn";
+        btn.id = `ad-btn-${i}`;
+        btn.innerText = `🎬 এড ${i} দেখুন`;
+        btn.onclick = () => watchAd(i);
+        adsContainer.appendChild(btn);
+
+        checkCooldown(i);
+    }
+
+    function watchAd(adIndex) {
+        window.open(AD_URL, '_blank');
+
+        balance += 10.00;
+        totalAds += 1;
+        updateUI();
+
+        const expireTime = Date.now() + (COOLDOWN_TIME * 1000);
+        localStorage.setItem(`ad_timer_${adIndex}`, expireTime);
+
+        checkCooldown(adIndex);
+    }
+
+    function checkCooldown(adIndex) {
+        const btn = document.getElementById(`ad-btn-${adIndex}`);
+        const expireTime = localStorage.getItem(`ad_timer_${adIndex}`);
+
+        if (expireTime) {
+            const interval = setInterval(() => {
+                const remainingTime = Math.floor((expireTime - Date.now()) / 1000);
+
+                if (remainingTime <= 0) {
+                    clearInterval(interval);
+                    localStorage.removeItem(`ad_timer_${adIndex}`);
+                    btn.disabled = false;
+                    btn.innerText = `🎬 এড ${adIndex} দেখুন`;
+                } else {
+                    btn.disabled = true;
+                    let mins = Math.floor(remainingTime / 60);
+                    let secs = remainingTime % 60;
+                    btn.innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+                }
+            }, 1000);
+        }
+    }
+
+    function claimTelegramTask() {
+        window.open('https://t.me/your_channel', '_blank');
+        balance += 50.00;
+        updateUI();
+        alert('৫০ টাকা বোনাস সফলভাবে যোগ করা হয়েছে!');
+    }
+
+    function requestWithdraw() {
+        if(referCount < 15) {
+            alert('টাকা তুলতে কমপক্ষে ১৫ জন রেফার প্রয়োজন!');
+        } else {
+            alert('উইথড্র রিকোয়েস্ট সফল হয়েছে!');
+        }
+    }
+
+    function copyReferLink() {
+        const botUsername = "DailyCashProBot"; // আপনার বটের ইউজারনেম দিয়ে পরিবর্তন করুন
+        const referLink = `https://t.me/${botUsername}?start=${userId}`;
+        
+        navigator.clipboard.writeText(referLink).then(() => {
+            alert('আপনার রেফারেল লিংক কপি করা হয়েছে:\n' + referLink);
+        }).catch(() => {
+            alert('রেফারেল লিংক: ' + referLink);
+        });
+    }
+
+    updateUI();
+</script>
+
+</body>
+</html>
+        
+        .ads-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .refer-box {
+            background: #eef7ff;
+            border: 1px dashed #0088cc;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- হোম পেজ -->
+    <div id="home-page" class="page active-page">
+        <div class="balance-card">
+            <h3>আপনার ব্যালেন্স</h3>
+            <h1><span class="bal-text">৫০.০০</span> টাকা</h1>
+            <small id="user-name">স্বাগতম, ইউজার</small>
+        </div>
+
+        <div class="card">
+            <h3>📜 কাজ করার নিয়ম</h3>
+            <p style="font-size: 13px; color: #555;">প্রতি এড দেখলে ১০ টাকা যোগ হবে। বন্ধুদের রেফার করলেই পাবেন ৫০ টাকা বোনাস!</p>
+        </div>
+
+        <div class="card refer-box">
+            <p style="font-size:13px; font-weight:bold; color:#0088cc; margin:0 0 5px 0;">🎁 বন্ধুদের রেফার করে ৫০ টাকা বোনাস নিন</p>
+            <button class="join-btn" style="padding: 8px; font-size: 14px;" onclick="copyReferLink()">🔗 রেফারেল লিংক কপি করুন</button>
+        </div>
+
+        <div class="grid-container">
+            <div class="card" style="text-align: center;">
+                <p>আজকের দেখা এড</p>
+                <h2 id="hourly-ads">0/30</h2>
+            </div>
+            <div class="card" style="text-align: center;">
+                <p>রেফারেল (টার্গেট ১৫)</p>
+                <h2 id="ref-count">0/15</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- টাস্ক পেজ -->
+    <div id="task-page" class="page">
+        <div class="card" style="background: #ff7e00; color: white;">
+            <h3 style="margin:0;">📋 টাস্ক পূরণ করুন</h3>
+            <p style="margin:5px 0 0 0; font-size:12px;">এড দেখে এবং চ্যানেল জয়েন করে ইনকাম করুন</p>
+        </div>
+
+        <div class="card">
+            <h3>▶️ এড দেখে ইনকাম</h3>
+            <p style="font-size:13px; color:#666;">প্রতি এড দেখে ১০ টাকা উপার্জন করুন (১০ মিনিট পর পর)</p>
+            
+            <div class="ads-grid" id="ads-container"></div>
+        </div>
+
+        <div class="card">
+            <h3>✈️ টেলিগ্রাম চ্যানেল জয়েন</h3>
+            <p style="font-size:13px; color:#666;">জয়েন করুন ও বোনাস নিন (৫০ টাকা)</p>
+            <button class="join-btn" onclick="claimTelegramTask()">🤖 জয়েন করুন ও বোনাস নিন</button>
+        </div>
+    </div>
+
+    <!-- উইথড্র পেজ -->
+    <div id="withdraw-page" class="page">
+        <div class="card">
+            <h3 style="color:#ff7e00; margin-top:0;">৳ টাকা উত্তোলন করুন</h3>
+            <p style="font-size: 13px; color: #666;">টাকা তুলতে কমপক্ষে ১৫ জন রেফার প্রয়োজন। (আপনার রেফার: <b id="ref-count-2">0/15</b>)</p>
+            
+            <div class="method-btn"><span>💖 বিকাশ (bKash)</span> <span>৳১০০</span></div>
+            <div class="method-btn"><span>🧡 নগদ (Nagad)</span> <span>৳১০০</span></div>
+            <div class="method-btn"><span>💜 রকেট (Rocket)</span> <span>৳১০০</span></div>
+
+            <button class="ad-btn" style="background:#27ae60;" onclick="requestWithdraw()">উইথড্র রিকোয়েস্ট পাঠান</button>
+        </div>
+    </div>
+
+    <!-- প্রোফাইল পেজ -->
+    <div id="profile-page" class="page">
+        <div class="card" style="text-align: center;">
+            <h2>👤 ইউজার প্রোফাইল</h2>
+            <hr style="border:0.5px solid #eee;">
+            <p>বর্তমান ব্যালেন্স: <b class="bal-text">৫০.০০</b> টাকা</p>
+            <p>মোট সম্পন্ন এড: <b id="total-ads">0</b></p>
+            <p>মোট রেফারেল: <b id="ref-count-3">0/15</b></p>
+            
+            <div class="refer-box">
                 <p style="font-size: 12px; color: #333; margin-bottom: 5px;">আপনার রেফার কোড: <b id="my-code-display" style="color:#0088cc;">-</b></p>
                 <button class="ad-btn" style="background:#0088cc; margin-top:0;" onclick="copyReferLink()">🔗 রেফারেল লিংক কপি করুন</button>
             </div>
