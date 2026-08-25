@@ -174,11 +174,11 @@
     <div id="withdraw-page" class="page">
         <div class="card">
             <h3 style="color:#ff7e00; margin-top:0;">৳ টাকা উত্তোলন করুন</h3>
-            <p style="font-size: 13px; color: #666;">টাকা তুলতে কমপক্ষে ১৫ জন রেফার প্রয়োজন। (আপনার রেফার: <b id="ref-count-2">0/15</b>)</p>
+            <p style="font-size: 13px; color: #666;">সর্বনিম্ন উইথড্র ৫০০ টাকা এবং কমপক্ষে ১৫ জন রেফার প্রয়োজন। (আপনার রেফার: <b id="ref-count-2">0/15</b>)</p>
             
-            <div class="method-btn"><span>💖 বিকাশ (bKash)</span> <span>৳১০০</span></div>
-            <div class="method-btn"><span>🧡 নগদ (Nagad)</span> <span>৳১০০</span></div>
-            <div class="method-btn"><span>💜 রকেট (Rocket)</span> <span>৳১০০</span></div>
+            <div class="method-btn"><span>💖 বিকাশ (bKash)</span> <span>৳৫০০</span></div>
+            <div class="method-btn"><span>🧡 নগদ (Nagad)</span> <span>৳৫০০</span></div>
+            <div class="method-btn"><span>💜 রকেট (Rocket)</span> <span>৳৫০০</span></div>
 
             <button class="ad-btn" style="background:#27ae60;" onclick="requestWithdraw()">উইথড্র রিকোয়েস্ট পাঠান</button>
         </div>
@@ -328,7 +328,9 @@
     }
 
     function requestWithdraw() {
-        if(referCount < 15) {
+        if (balance < 500) {
+            alert('আপনার ব্যালেন্স সর্বনিম্ন ৫০০ টাকা হতে হবে!');
+        } else if (referCount < 15) {
             alert('টাকা তুলতে কমপক্ষে ১৫ জন রেফার প্রয়োজন!');
         } else {
             alert('উইথড্র রিকোয়েস্ট সফল হয়েছে!');
